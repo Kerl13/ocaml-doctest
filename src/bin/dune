@@ -1,0 +1,4 @@
+(executable
+ (name doctest)
+ (modes (byte exe))
+ (libraries doctest))

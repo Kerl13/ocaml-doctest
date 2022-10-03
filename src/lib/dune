@@ -1,0 +1,4 @@
+(library
+ (name doctest)
+ (public_name doctest)
+ (libraries compiler-libs.common compiler-libs.toplevel odoc-parser))
