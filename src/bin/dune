@@ -1,4 +1,5 @@
 (executable
+ (public_name doctest)
  (name doctest)
  (modes (byte exe))
- (libraries doctest))
+ (libraries doctest compiler-libs.toplevel))

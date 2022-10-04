@@ -1,12 +1,38 @@
 (** This is a random ocamldoc comment *)
-let x = 0
+let toto = 0
 
-(** This ocamldoc comment contains a test
+(** Try to find the answer to the ultimate question of life, the universe and
+    everything.
 
-    Examples:
+    Example:
+
     {[
-      # let six = 6 in let two = 2 in six - two;;
-      - : int = 4
+      # A.ultimate_answer () ;;
+      - : int = 42
     ]}
 *)
-let y = 0
+let ultimate_answer () = 42
+
+(** Double its argument. 
+
+    Examples:
+
+    {[
+      # A.double 1 ;;
+      - : int = 2
+    ]}
+
+    {[
+      # A.double 21 ;;
+      - : int = 42
+    ]}
+
+    Note that the double of zero is zero:
+
+    {[
+      # A.double 0 = 0 ;;
+      - : bool = true
+    ]}
+*)
+let double x =
+  x * 2

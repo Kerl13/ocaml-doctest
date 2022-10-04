@@ -1,10 +1,8 @@
 build:
-	dune build @install
+	dune build
 
 test:
-	ocamlc -c -bin-annot tests/a.ml
-	dune exec src/bin/doctest.exe tests/a.cmt
+	dune exec src/bin/doctest.exe _build/default/tests/.a.objs/byte/a.cmt
 
 clean:
 	dune clean
-	rm -f tests/*.cmi tests/*.cmo tests/*.cmt
