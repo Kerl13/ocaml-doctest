@@ -11,7 +11,7 @@ let zero = 0
 
     Example:
 
-    {[
+    {@doctest [
       # A.ultimate_answer () ;;
       - : int = 42
     ]}
@@ -22,19 +22,19 @@ let ultimate_answer () = 42
 
     Examples:
 
-    {[
+    {@doctest [
       # A.double 1 ;;
       - : int = 2
     ]}
 
-    {[
+    {@doctest [
       # A.double 21 ;;
       - : int = 42
     ]}
 
     Special case: note that the double of zero is zero:
 
-    {[
+    {@doctest [
       # A.double 0 = 0 ;;
       - : bool = true
     ]}
@@ -42,7 +42,7 @@ let ultimate_answer () = 42
     Be aware that [double] only works for ints because *type systems*.
     (Okay, this is just a pretext to test exception handling in doctest.)
 
-    {[
+    {@doctest [
       # A.double 0.5 ;;
       Error: This expression has type float
              but an expression was expected of type int
@@ -55,7 +55,7 @@ let double x =
 
     This the the [abs] function, it always returns a non negative value… Right?
 
-    {[
+    {@doctest [
       # A.abs min_int > 0 ;;
       - : bool = true
     ]}

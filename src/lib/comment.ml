@@ -20,23 +20,25 @@ let collect_doctests: t -> _ list =
   let module Ast = Odoc_parser.Ast in
   let module Loc = Odoc_parser.Loc in
 
-  let collect_code_block tests options content =
-    ignore options;
-    Test.parse content.Loc.value :: tests
-  in
-
-  let collect_block (tests: _ list) : Ast.block_element -> _ list = function
-    | `Paragraph _ -> tests
-    | `Code_block (options, content) -> collect_code_block tests options content
-    | `Verbatim _ -> tests
-    | `Modules _ -> tests
-    | `List _ -> tests
-    | `Tag _ -> tests
-    | `Heading _ -> tests
+  let rec collect tests (block: Ast.nestable_block_element Loc.with_location) =
+    match block.value with
+    | `Code_block (Some (lang, _), content) when lang.value = "doctest" ->
+      Test.parse content.value :: tests
+    | `List (_, _, elts) -> collect_listlist tests elts
+    | _ -> tests
+  and collect_listlist tests =
+    (* Why is this a list of lists? *)
+      List.fold_left (List.fold_left collect) tests
   in
 
   fun comment ->
     List.fold_left
-      (fun tests wl -> collect_block tests wl.Loc.value)
+      (* Very frustrating code duplication here... *)
+      (fun tests (block: Ast.block_element Loc.with_location) ->
+        match block.Loc.value with
+        | `List (_, _, elts) -> collect_listlist tests elts
+        | `Code_block (Some (lang, _), content) when lang.value = "doctest" ->
+          Test.parse content.value :: tests
+        | _ -> tests)
       []
       comment.ast
