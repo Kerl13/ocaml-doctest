@@ -18,7 +18,7 @@ let zero = 0
 *)
 let ultimate_answer () = 42
 
-(** [double] double its argument.
+(** [double] doubles its argument.
 
     Examples:
 
