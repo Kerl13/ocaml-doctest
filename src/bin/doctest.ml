@@ -1,13 +1,26 @@
 open Doctest
 
-let parse_args args =
-  let nargs = Array.length args in
-  if nargs <> 2 then (
-    let progname = if nargs = 1 then Sys.argv.(0) else "EXECUTABLE" in
-    Format.eprintf "Usage: %s FILE.cmt" progname;
+let progname =
+  if Array.length Sys.argv > 0 then Sys.argv.(0) else "EXECUTABLE"
+
+let parse_args () =
+  let usage = Format.sprintf "Usage: %s FILE" progname in
+  let speclist = [] in
+  let arg = ref None in
+  let anon_fun filename =
+    match !arg with
+    | None -> arg := Some filename
+    | Some _ ->
+      Arg.usage speclist usage;
+      Format.eprintf "Too many arguments\n";
+      exit 1
+  in
+  Arg.parse speclist anon_fun usage;
+  match !arg with
+  | Some filename -> filename
+  | None ->
+    Format.eprintf "Missing argument: FILE";
     exit 1
-  );
-  args.(1)
 
 let (>>=) = Result.bind
 
@@ -28,7 +41,7 @@ let handle_comment comment =
       Location.print_loc (Comment.location comment) ok total
 
 let () =
-  let file = parse_args Sys.argv |> File.of_filename in
+  let file = parse_args () |> File.of_filename in
 
   Toplevel.initial_setup ();
   match Toplevel.load file with
