@@ -1,2 +1,8 @@
 (library
  (name a))
+
+(rule
+ (alias runtest)
+ (deps .a.objs/byte/a.cmt)
+ (action
+  (run doctest .a.objs/byte/a.cmt)))

@@ -2,7 +2,7 @@ build:
 	dune build
 
 test:
-	dune exec src/bin/doctest.exe _build/default/tests/.a.objs/byte/a.cmt
+	dune runtest
 
 clean:
 	dune clean
