@@ -33,12 +33,10 @@ let collect_doctests: t -> _ list =
 
   fun comment ->
     List.fold_left
-      (* Very frustrating code duplication here... *)
       (fun tests (block: Ast.block_element Loc.with_location) ->
         match block.Loc.value with
-        | `List (_, _, elts) -> collect_listlist tests elts
-        | `Code_block (Some (lang, _), content) when lang.value = "doctest" ->
-          Test.parse content.value :: tests
+        | #Ast.nestable_block_element as elt ->
+          collect tests (Loc.at block.location elt)
         | _ -> tests)
       []
       comment.ast
