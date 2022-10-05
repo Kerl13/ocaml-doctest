@@ -4,27 +4,30 @@ type t = {
 }
 
 let search_end_of_cmd s =
+  let len = String.length s in 
+  let open InOptionMonad in
   let rec search i =
-    if i >= String.length s - 2 then
-      None
-    else
-      if s.[i] = ';' then
-        if s.[i + 1] = ';' then (
-          assert (s.[i + 2] = '\n');
-          Some i
-        ) else search (i + 2)
-      else
-        search (i + 1)
+    let* i = String.index_from_opt s i ';' in
+    if i + 1 = len then None
+    else if s.[i + 1] = ';' then Some (i + 2)
+    else search (i + 1)
   in
   search 0
 
 let parse (s: string) : (t, Error.t) Result.t =
-  match search_end_of_cmd s with
-  | Some i -> Ok {
-      phrase = String.sub s 2 i;
-      expect = String.sub s (i + 3) (String.length s - i - 3)
-    }
-  | None -> Error.fail "Could not parse: %s" s
+  let len = String.length s in
+  InOptionMonad.(
+    if len < 2 || s.[0] <> '#' || s.[1] <> ' ' then
+      None
+    else
+      let* end_cmd = search_end_of_cmd s in
+      let+ end_line = String.index_from_opt s end_cmd '\n' in
+      { phrase = String.sub s 2 (end_cmd - 2);
+        expect = String.(trim (sub s end_line (len - end_line))) }
+  )
+  |> Option.fold
+    ~none:(Error.fail "could not parse: %s" s)
+    ~some:Result.ok
 
 let (>>=) = Result.bind
 
