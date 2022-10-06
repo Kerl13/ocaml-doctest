@@ -12,7 +12,7 @@ let zero = 0
     Example:
 
     {@doctest [
-      # A.ultimate_answer () ;;
+      # Testlib.A.ultimate_answer () ;;
       - : int = 42
     ]}
 *)
@@ -23,19 +23,19 @@ let ultimate_answer () = 42
     Examples:
 
     {@doctest [
-      # A.double 1 ;;
+      # Testlib.A.double 1 ;;
       - : int = 2
     ]}
 
     {@doctest [
-      # A.double 21 ;;
+      # Testlib.A.double 21 ;;
       - : int = 42
     ]}
 
     Special case: note that the double of zero is zero:
 
     {@doctest [
-      # A.double 0 = 0 ;;
+      # Testlib.A.double 0 = 0 ;;
       - : bool = true
     ]}
 
@@ -43,9 +43,22 @@ let ultimate_answer () = 42
     (Okay, this is just a pretext to test exception handling in doctest.)
 
     {@doctest [
-      # A.double 0.5 ;;
+      # Testlib.A.double 0.5 ;;
       Error: This expression has type float
              but an expression was expected of type int
+    ]}
+
+    By the way, you can call functions from other modules to check that [double]
+    behaves correctly:
+
+    {@doctest [
+      # Testlib.A.double 4 = Testlib.B.multiply 2 4 ;;
+      - : bool = true
+    ]}
+
+    {@doctest [
+      # Testlib.A.double 4 = Testlib.B.add 4 4 ;;
+      - : bool = true
     ]}
 *)
 let double x =
@@ -56,7 +69,7 @@ let double x =
     This the the [abs] function, it always returns a non negative value… Right?
 
     {@doctest [
-      # A.abs min_int > 0 ;;
+      # Testlib.A.abs min_int > 0 ;;
       - : bool = true
     ]}
 *)

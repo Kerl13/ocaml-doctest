@@ -1,8 +1,9 @@
 (library
- (name a))
+ (name testlib)
+ (modules A B))
 
 (rule
  (alias runtest)
- (deps .a.objs/byte/a.cmt)
+ (deps %{cma:testlib})
  (action
-  (run doctest .a.objs/byte/a.cmt)))
+  (run doctest -d .testlib.objs/byte -l %{cma:testlib} .testlib.objs/byte/testlib__A.cmt)))
