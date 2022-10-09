@@ -1,3 +1,5 @@
+open Utils
+
 type instruction = {
   phrase: string;
   expect: string
@@ -22,7 +24,7 @@ let rec parse instructions s i =
     Ok (List.rev instructions)
   else if s.[i] = '#' then (* Start of an instruction *)
     match ExtString.index_from_substring s i ";;" with
-    | None -> Error.fail "could not find the end-of-phrase token (;;)"
+    | None -> fail "could not find the end-of-phrase token (;;)"
     | Some j ->
       (* This is a top-level phrase to execute as part of the test. *)
       let phrase = String.sub s (i + 2) (j - i) in
@@ -39,10 +41,8 @@ let rec parse instructions s i =
       | None ->
         (* We are at the end of the doctest block. No output is expected. *)
         Ok (List.rev ({phrase; expect = ""} :: instructions))
-  else (
-    Format.eprintf "ERROR: FOUND ===%c=== as position %d@." s.[i] i;
-    Error.fail "A top-level phrase must start with a '#'"
-  )
+  else
+    fail "A top-level phrase must start with a '#'"
 let parse s = parse [] s 0
 
 let run (doctests: t) =
@@ -50,31 +50,30 @@ let run (doctests: t) =
   let fmt = Format.formatter_of_buffer buffer in
   List.fold_left
     (fun state {phrase; expect} ->
-      let open ResultMonadSyntax in
       Buffer.clear buffer;
       let* () =
         let lexbuf = Lexing.from_string phrase in
         try
           if Toploop.(execute_phrase true fmt (!parse_toplevel_phrase lexbuf))
-          then Ok ()
-          else Error.fail "something went wrong"
+          then ok
+          else fail "something went wrong"
         with exn ->
           Location.report_exception fmt exn;
-          Ok ()
+          ok
       in
       let result =
         let got = Buffer.to_bytes buffer |> String.of_bytes in
         if not (ExtString.loose_equality got expect) then
-          Error.fail "The following test failed:\n  %s\nExpected:\n  %s\nGot:\n  %s\n"
+          fail "The following test failed:\n  %s\nExpected:\n  %s\nGot:\n  %s\n"
             phrase expect got
         else
-          Ok ()
+          ok
       in
-      match state, result with
-      | Ok (), Ok () -> Ok ()
-      | (Ok (), (Error _ as err) | (Error _ as err), Ok ()) -> err
-      | Error e1, Error e2 -> Error (Error.combine e1 e2))
-    (Ok ())
+      Result.fold
+        ~ok:(fun () -> result)
+        ~error:(fun err -> Result.map_error (Error.combine err) result)
+        state)
+    ok
     doctests
 
 (** {2 Pretty printing} *)

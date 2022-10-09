@@ -1,3 +1,5 @@
+open Utils
+
 (* FIXME: dirty hack *)
 let __patched_printer = ref false
 
@@ -8,7 +10,7 @@ let initialise ~dirs ~loads =
   List.iter
     (fun filename ->
       if not (Toploop.load_file Format.err_formatter filename) then
-        Format.ksprintf failwith "could not load file `%s'" filename)
+        panic "could not load file `%s'" filename)
     loads;
 
   (* FIXME: dirty hack *)
