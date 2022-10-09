@@ -1,85 +1,88 @@
-type t = {
+type instruction = {
   phrase: string;
   expect: string
 }
 
-let search_end_of_cmd s =
-  let len = String.length s in 
-  let open InOptionMonad in
-  let rec search i =
-    let* i = String.index_from_opt s i ';' in
-    if i + 1 = len then None
-    else if s.[i + 1] = ';' then Some (i + 2)
-    else search (i + 1)
-  in
-  search 0
+type t = instruction list
 
-let parse (s: string) : (t, Error.t) Result.t =
-  let len = String.length s in
-  InOptionMonad.(
-    if len < 2 || s.[0] <> '#' || s.[1] <> ' ' then
-      None
-    else
-      let* end_cmd = search_end_of_cmd s in
-      let+ end_line = String.index_from_opt s end_cmd '\n' in
-      { phrase = String.sub s 2 (end_cmd - 2);
-        expect = String.(trim (sub s end_line (len - end_line))) }
+let rec find_start_of_phrase s i =
+  let i = ExtString.skip_whitespaces s i in
+  if i < String.length s && s.[i] = '#' then
+    Some i
+  else
+    match String.index_from_opt s i '\n' with
+    | Some i -> find_start_of_phrase s i
+    | None -> None
+
+let rec parse instructions s i =
+  (* We don't care about leading or trailing whitespaces *)
+  let i = ExtString.skip_whitespaces s i in
+  if i = String.length s then
+    (* We are done *)
+    Ok (List.rev instructions)
+  else if s.[i] = '#' then (* Start of an instruction *)
+    match ExtString.index_from_substring s i ";;" with
+    | None -> Error.fail "could not find the end-of-phrase token (;;)"
+    | Some j ->
+      (* This is a top-level phrase to execute as part of the test. *)
+      let phrase = String.sub s (i + 2) (j - i) in
+      match String.index_from_opt s (j + 2) '\n' with
+      | Some i ->
+        (* Expected output of the test *)
+        (match find_start_of_phrase s i with
+        | Some j ->
+          let expect = String.(trim (sub s i (j - i))) in
+          parse ({phrase; expect} :: instructions) s j
+        | None ->
+          let expect = String.(trim (sub s i (String.length s - i))) in
+          Ok (List.rev ({phrase; expect} :: instructions)))
+      | None ->
+        (* We are at the end of the doctest block. No output is expected. *)
+        Ok (List.rev ({phrase; expect = ""} :: instructions))
+  else (
+    Format.eprintf "ERROR: FOUND ===%c=== as position %d@." s.[i] i;
+    Error.fail "A top-level phrase must start with a '#'"
   )
-  |> Option.fold
-    ~none:(Error.fail "could not parse: %s" s)
-    ~some:Result.ok
+let parse s = parse [] s 0
 
-let (>>=) = Result.bind
-
-let is_whitespace = function
-  | ' ' | '\n' | '\t' | '\r' -> true
-  | _ -> false
-
-let rec fast_fwd i s =
-  if i < String.length s && is_whitespace s.[i]
-  then fast_fwd (i + 1) s
-  else i
-
-let lax_string_equal s1 s2 =
-  let len1 = String.length s1 and len2 = String.length s2 in
-
-  (* Ugliest thing ever *)
-  let rec equal i j =
-    if i = len1 then
-      fast_fwd j s2 = len2
-    else if j = len2 then
-      fast_fwd i s1 = len1
-    else if s1.[i] = s2.[j] then
-      equal (i + 1) (j + 1)
-    else if is_whitespace s1.[i] || is_whitespace s2.[j] then
-      equal (fast_fwd i s1) (fast_fwd j s2)
-    else false
-  in
-  equal 0 0
-
-let run doctest =
+let run (doctests: t) =
   let buffer = Buffer.create 0 in
   let fmt = Format.formatter_of_buffer buffer in
-  let test_run =
-    let lexbuf = Lexing.from_string doctest.phrase in
-    (* Location.report_printer := (fun () -> Location.terminfo_toplevel_printer lexbuf); *)
-    try
-      if Toploop.(execute_phrase true fmt (!parse_toplevel_phrase lexbuf))
-      then Ok ()
-      else Error.fail "something went wrong"
-    with exn ->
-      Location.report_exception fmt exn;
-      Ok ()
-  in
-  test_run >>= (fun () ->
-    let got = Buffer.to_bytes buffer |> String.of_bytes in
-    if not (lax_string_equal got doctest.expect) then
-      Error.fail "The following test failed:\n  %s\nExpected:\n  %s\nGot:\n  %s\n"
-        doctest.phrase doctest.expect got
-    else
-      Ok ())
+  List.fold_left
+    (fun state {phrase; expect} ->
+      let open ResultMonadSyntax in
+      Buffer.clear buffer;
+      let* () =
+        let lexbuf = Lexing.from_string phrase in
+        try
+          if Toploop.(execute_phrase true fmt (!parse_toplevel_phrase lexbuf))
+          then Ok ()
+          else Error.fail "something went wrong"
+        with exn ->
+          Location.report_exception fmt exn;
+          Ok ()
+      in
+      let result =
+        let got = Buffer.to_bytes buffer |> String.of_bytes in
+        if not (ExtString.loose_equality got expect) then
+          Error.fail "The following test failed:\n  %s\nExpected:\n  %s\nGot:\n  %s\n"
+            phrase expect got
+        else
+          Ok ()
+      in
+      match state, result with
+      | Ok (), Ok () -> Ok ()
+      | (Ok (), (Error _ as err) | (Error _ as err), Ok ()) -> err
+      | Error e1, Error e2 -> Error (Error.combine e1 e2))
+    (Ok ())
+    doctests
 
 (** {2 Pretty printing} *)
 
-let pp fmt doctest =
-  Format.fprintf fmt "# %s\n%s" doctest.phrase doctest.expect
+let pp_instruction fmt {phrase; expect} =
+  Format.fprintf fmt "# %s\n%s" phrase expect
+
+let pp =
+  Format.pp_print_list
+    ~pp_sep:(fun fmt () -> Format.fprintf fmt "\n")
+    pp_instruction
