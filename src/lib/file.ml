@@ -3,15 +3,9 @@ type t = string
 (** {2 File operations} *)
 
 let of_filename (filename: string) : t =
-  if not (Filename.check_suffix filename ".cmt") then
-    invalid_arg "File.of_filename: a .cmt file is expected";
-  filename
-
-let obj_file file =
-  (
-    Filename.dirname file,
-    Filename.(basename (chop_suffix file ".cmt" ^ ".cmo"))
-  )
+  match Filename.extension filename with
+  | ".cmt" | ".cmti" -> filename
+  | _ -> invalid_arg "File.of_filename: a .cmt file is expected"
 
 let collect_doc_comments file =
   let cmt = Cmt_format.read_cmt file in

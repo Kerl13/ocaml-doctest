@@ -8,4 +8,5 @@
  (action
   (run doctest -d .testlib.objs/byte -l %{cma:testlib}
        .testlib.objs/byte/testlib__A.cmt
-       .testlib.objs/byte/testlib__B.cmt)))
+       .testlib.objs/byte/testlib__B.cmt
+       .testlib.objs/byte/testlib__B.cmti)))

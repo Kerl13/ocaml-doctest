@@ -1,30 +1,17 @@
-(** This is a multi line test
-
-    {@doctest [
-      # let open Testlib.B in
-        let x = 21 in
-        let one = 1 in
-        multiply x (add one one);;
-      - : int = 42
-    ]}
-*)
-
 let add x y = x + y
 
-(** This is a doctest with multiple statements
+(** This ocamldoc comment is not part of the interface file [b.mli]. It won't
+    appear in the documentation but can nevertheless contain doctests.
+
+    This can be used to add extra tests that don't deserve to be part of the
+    official documentation of your package but can be useful to maintainers
+    and/or increase test coverage.
 
     {@doctest [
       # open Testlib.B ;;
-      # let x = 21 ;;
-      val x : int = 21
-      # multiply x 2 ;;
-      - : int = 42
-      # let y =
-        multiply x (* Look! Comments
-          spanning multiple lines work! *) 2 
-        (* That is because we reuse OCaml's top level parser *)
-        ;;
-      val y : int = 42
+      # let x = 37 in
+        multiply 4 x = add (add x x) (add x x) ;;
+      - : bool = true
     ]}
- *)
+*)
 let multiply x y = x * y
