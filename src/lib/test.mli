@@ -15,18 +15,11 @@ val parse: string -> (t, Error.t) Result.t
     For instance:
 
     {@doctest [
-      # List.length [1; 2; 3];;
-      - : int = 3
-    ]}
-
-    {@doctest [
       # open Doctest ;;
-      # let test = Test.parse "let x = 2 + 2 ;;\nval x : int = 4" in
-      Result.is_ok test ;;
-      - : bool = true
-      # let woops = Test.parse "let s = \"I forgot the double semicolon\"" in
-      Result.is_ok woops ;;
-      - : bool = false
+      # let test = Test.parse "# let x = 2 + 2 ;;\nval x : int = 4" ;;
+      val test : (Doctest.Test.t, Doctest.Error.t) Result.t = Result.Ok <abstr>
+      # let woops = Test.parse "let s = \"I forgot the double semicolon\"" ;;
+      val woops : (Doctest.Test.t, Doctest.Error.t) Result.t = Result.Error <abstr>
     ]}
 *)
 

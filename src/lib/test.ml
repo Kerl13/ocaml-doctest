@@ -116,7 +116,7 @@ let run (doctests: t) =
         try
           if Toploop.(execute_phrase true fmt phrase)
           then ok
-          else fail "something went wrong"
+          else fail "something went wrong at %a" pp_phrase phrase
         with exn ->
           Location.report_exception fmt exn;
           ok
@@ -124,14 +124,15 @@ let run (doctests: t) =
       let result =
         let got = Buffer.to_bytes buffer |> String.of_bytes |> String.trim in
         if not (ExtString.loose_equality got expect) then
+        (* if not (String.equal got expect) then *)
           fail "The following test failed:\n  %a\nExpected:\n  %s\nGot:\n  %s"
             pp_phrase phrase expect got
         else
           ok
       in
-      Result.fold
-        ~ok:(fun () -> result)
-        ~error:(fun err -> Result.map_error (Error.combine err) result)
-        state)
+      match state, result with
+      | Ok (), Ok () -> ok
+      | Ok (), (Error _ as err) | (Error _ as err), Ok () -> err
+      | Error e1, Error e2 -> Error (Error.combine e1 e2))
     ok
     doctests

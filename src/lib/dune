@@ -5,7 +5,7 @@
 
 (rule
  (alias runtest)
- (deps %{cma:doctest})
+ (deps (package doctest))
  (action
   (run doctest
        -d .doctest.objs/byte
