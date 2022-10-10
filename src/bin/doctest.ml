@@ -4,7 +4,7 @@ let progname =
   if Array.length Sys.argv > 0 then Sys.argv.(0) else "EXECUTABLE"
 
 type config = {
-  loads: string list;
+  libs: string list;
   dirs: string list;
   cmts: string list;
 }
@@ -17,20 +17,20 @@ let parse_args () =
   in
   let cmts = ref [] in
   let dirs = ref [] in
-  let loads = ref [] in
+  let libs = ref [] in
   let speclist = [
     "-d", Arg.String (append dirs),
     "directory to load in the ocaml interpreter (via #directory)";
-    "-l", Arg.String (append loads),
+    "-l", Arg.String (append libs),
     "libraries (.cma files) to load in the ocaml interpreter (via #load)";
   ] in
   Arg.parse speclist (append cmts) usage;
-  {loads = !loads; dirs = !dirs; cmts = !cmts}
+  {libs = !libs; dirs = !dirs; cmts = !cmts}
 
 let () =
   let config = parse_args () in
 
-  Toplevel.initialise ~dirs:config.dirs ~loads:config.loads;
+  Toplevel.initialise ~dirs:config.dirs ~libs:config.libs;
 
   let report =
     List.fold_left

@@ -2,3 +2,14 @@
  (name doctest)
  (public_name doctest)
  (libraries compiler-libs.common compiler-libs.toplevel odoc-parser))
+
+(rule
+ (alias runtest)
+ (deps %{cma:doctest})
+ (action
+  (run doctest
+       -d .doctest.objs/byte
+       -l %{lib:result:result.cma} ; WHY?!
+       -l %{cma:doctest}
+       .doctest.objs/byte/doctest__Test.cmti
+       .doctest.objs/byte/doctest__File.cmti)))
