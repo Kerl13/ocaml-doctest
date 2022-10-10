@@ -63,18 +63,3 @@ let ultimate_answer () = 42
 *)
 let double x =
   x * 2
-
-(** Let us add a failing test now.
-
-    This the the [abs] function, it always returns a non negative value… Right?
-
-    {@doctest [
-      # Testlib.A.abs min_int > 0 ;;
-      - : bool = true
-    ]}
-*)
-let abs x =
-  if x < 0 then
-    - x
-  else
-    x

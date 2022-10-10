@@ -1,6 +1,5 @@
 (library
- (name testlib)
- (modules A B))
+ (name testlib))
 
 (rule
  (alias runtest)
@@ -10,3 +9,15 @@
        .testlib.objs/byte/testlib__A.cmt
        .testlib.objs/byte/testlib__B.cmt
        .testlib.objs/byte/testlib__B.cmti)))
+
+(rule
+ (alias runtest)
+ (deps %{cma:testlib})
+ (action
+  (progn
+   (with-outputs-to negative.actual
+    ; This test should fail, the only acceptable exit code is 1 here.
+    (with-accepted-exit-codes 1
+     (run doctest -d .testlib.objs/byte -l %{cma:testlib}
+          .testlib.objs/byte/testlib__Negative.cmt)))
+   (diff negative.actual negative.expected))))

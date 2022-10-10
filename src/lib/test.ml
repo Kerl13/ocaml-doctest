@@ -90,6 +90,7 @@ module Parsing = struct
             lexbuf.lex_buffer
             expect_start
             (lexbuf.lex_curr_pos - expect_start)
+          |> String.trim
         in
         let items = {phrase; expect} :: items in
         if found_next_phrase
@@ -121,9 +122,9 @@ let run (doctests: t) =
           ok
       in
       let result =
-        let got = Buffer.to_bytes buffer |> String.of_bytes in
+        let got = Buffer.to_bytes buffer |> String.of_bytes |> String.trim in
         if not (ExtString.loose_equality got expect) then
-          fail "The following test failed:\n  %a\nExpected:\n  %s\nGot:\n  %s\n"
+          fail "The following test failed:\n  %a\nExpected:\n  %s\nGot:\n  %s"
             pp_phrase phrase expect got
         else
           ok
