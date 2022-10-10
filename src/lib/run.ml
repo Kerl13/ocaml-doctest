@@ -34,8 +34,9 @@ let comment (comment: Comment.t) : Report.t =
       (Comment.collect_doctests comment)
   in
   let report = Report.make ok total in
-  Format.eprintf "[INFO] %a: %a@."
-    Location.print_loc (Comment.location comment) Report.pp report;
+  if total > 0 then
+    Format.eprintf "[INFO] %a: %a@."
+      Location.print_loc (Comment.location comment) Report.pp report;
   report
 
 let file (file: File.t) : Report.t =

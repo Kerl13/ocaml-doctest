@@ -19,6 +19,12 @@ let add x y = x + y
       val x : int = 21
       # multiply x 2 ;;
       - : int = 42
+      # let y =
+        multiply x (* Look! Comments
+          spanning multiple lines work! *) 2 
+        (* That is because we reuse OCaml's top level parser *)
+        ;;
+      val y : int = 42
     ]}
  *)
 let multiply x y = x * y
