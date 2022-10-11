@@ -1,3 +1,5 @@
+open Utils
+
 module Report = struct
   type t = {
     nb_tests: int;
@@ -19,16 +21,21 @@ module Report = struct
     Format.fprintf fmt "%d / %d tests passed" report.nb_ok report.nb_tests
 end
 
-let (>>=) = Result.bind
+let pp_loc fmt (loc: Odoc_parser.Loc.span) =
+  Format.fprintf fmt "File \"%s\", " loc.file;
+  if loc.start.line = loc.end_.line
+  then Format.fprintf fmt "line %d, " loc.start.line
+  else Format.fprintf fmt "lines %d-%d, " loc.start.line loc.end_.line;
+  Format.fprintf fmt "characters %d-%d:" loc.start.column loc.end_.column
 
 let comment (comment: Comment.t) : Report.t =
   let ok, total =
     List.fold_left
-      (fun (ok, total) doctest ->
+      (fun (ok, total) (doctest, loc) ->
         match doctest >>= Test.run with
         | Ok () -> (ok + 1, total + 1)
         | Error e ->
-          Format.eprintf "[ERROR] %s@." e;
+          Format.eprintf "[ERROR] %a\n%s@." pp_loc loc e;
           (ok, total + 1))
       (0, 0)
       (Comment.collect_doctests comment)

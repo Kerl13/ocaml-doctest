@@ -23,7 +23,7 @@ let collect_doctests: t -> _ list =
   let rec collect tests (block: Ast.nestable_block_element Loc.with_location) =
     match block.value with
     | `Code_block (Some (lang, _), content) when lang.value = "doctest" ->
-      Test.parse content.value :: tests
+      (Test.parse content.value, Loc.location block) :: tests
     | `List (_, _, elts) -> collect_listlist tests elts
     | _ -> tests
   and collect_listlist tests =
@@ -36,7 +36,7 @@ let collect_doctests: t -> _ list =
       (fun tests (block: Ast.block_element Loc.with_location) ->
         match block.Loc.value with
         | #Ast.nestable_block_element as elt ->
-          collect tests (Loc.at block.location elt)
+          collect tests (Loc.same block elt)
         | _ -> tests)
       []
       comment.ast

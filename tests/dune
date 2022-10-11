@@ -14,10 +14,12 @@
  (alias runtest)
  (deps %{cma:testlib})
  (action
-  (progn
-   (with-outputs-to negative.actual
-    ; This test should fail, the only acceptable exit code is 1 here.
-    (with-accepted-exit-codes 1
-     (run doctest -d .testlib.objs/byte -l %{cma:testlib}
-          .testlib.objs/byte/testlib__Negative.cmt)))
-   (diff negative.actual negative.expected))))
+  (with-outputs-to negative.actual
+   ; This test should fail, the only acceptable exit code is 1 here.
+   (with-accepted-exit-codes 1
+    (run doctest -d .testlib.objs/byte -l %{cma:testlib}
+         .testlib.objs/byte/testlib__Negative.cmt)))))
+
+(rule
+ (alias runtest)
+ (action (diff negative.expected negative.actual)))

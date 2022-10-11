@@ -1,4 +1,5 @@
-[ERROR] The following test failed:
+[ERROR] File "tests/negative.ml", lines 5-9, characters 4-6:
+The following test failed:
   (abs min_int) > 0
 Expected:
   - : bool = true
