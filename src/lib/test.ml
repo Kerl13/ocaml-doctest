@@ -81,7 +81,10 @@ module Parsing = struct
     match get_at_offset lexbuf 0, get_at_offset lexbuf 1 with
     | Some '#', Some ' ' ->
       skip lexbuf 2;
-      let phrase = !Toploop.parse_toplevel_phrase lexbuf in
+      let* phrase =
+        try Ok (Parse.toplevel_phrase lexbuf)
+        with exn -> fail "%a" Location.report_exception exn
+      in
       if find_next_eol lexbuf then (
         let expect_start = lexbuf.lex_curr_pos in
         let found_next_phrase = find_next_phrase lexbuf in
@@ -98,11 +101,15 @@ module Parsing = struct
         else Ok items
       ) else
         Ok ({phrase; expect = ""} :: items)
-    | _ -> Error.fail "parse error: expected `# ` at the start of next command"
+    | _ -> fail "parse error: expected `# ` at the start of next command"
 end
 
 let parse txt =
   let lexbuf = Lexing.from_string txt in
+  (* It's okay to have newlines and whitespaces at the beginning *)
+  Parsing.skip_while
+    (fun c -> c = ' ' || c = '\t' || c = '\n' || c = '\r')
+    lexbuf;
   let+ items = Parsing.rev_parse [] lexbuf in
   List.rev items
 
@@ -112,15 +119,10 @@ let run (doctests: t) =
   List.fold_left
     (fun state {phrase; expect} ->
       Buffer.clear buffer;
-      let* () =
-        try
-          if Toploop.(execute_phrase true fmt phrase)
-          then ok
-          else fail "something went wrong at %a" pp_phrase phrase
-        with exn ->
-          Location.report_exception fmt exn;
-          ok
-      in
+      (
+        try ignore (Toploop.(execute_phrase true fmt phrase))
+        with exn -> Location.report_exception fmt exn
+      );
       let result =
         let got = Buffer.to_bytes buffer |> String.of_bytes |> String.trim in
         if not (ExtString.loose_equality got expect) then
@@ -133,6 +135,6 @@ let run (doctests: t) =
       match state, result with
       | Ok (), Ok () -> ok
       | Ok (), (Error _ as err) | (Error _ as err), Ok () -> err
-      | Error e1, Error e2 -> Error (Error.combine e1 e2))
+      | Error e1, Error e2 -> Error (e1 ^ "\n" ^ e2))
     ok
     doctests

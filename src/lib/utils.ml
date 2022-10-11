@@ -9,9 +9,11 @@ let (>>=) = Result.bind
 let (<$>) = Result.map
 
 let ok = Ok ()
-let fail = Error.fail
 
-(** {2 Panicking} *)
+(** {2 Error handling} *)
 
 let panic args =
   Format.kasprintf (Format.eprintf "[PANIC] %s@.") args
+
+let fail args =
+  Format.kasprintf Result.error args

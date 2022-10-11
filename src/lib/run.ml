@@ -28,7 +28,7 @@ let comment (comment: Comment.t) : Report.t =
         match doctest >>= Test.run with
         | Ok () -> (ok + 1, total + 1)
         | Error e ->
-          Format.eprintf "[ERROR] %a@." Error.pp e;
+          Format.eprintf "[ERROR] %s@." e;
           (ok, total + 1))
       (0, 0)
       (Comment.collect_doctests comment)
