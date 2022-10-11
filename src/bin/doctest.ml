@@ -42,5 +42,5 @@ let () =
       config.cmts
   in
   let rc = if report.nb_ok < report.nb_tests then 1 else 0 in
-  Format.printf "Total: %a@." Run.Report.pp report;
+  Format.eprintf "[INFO] Total: %a@." Run.Report.pp report;
   exit rc
