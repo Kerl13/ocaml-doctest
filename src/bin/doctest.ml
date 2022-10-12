@@ -20,9 +20,9 @@ let parse_args () =
   let libs = ref [] in
   let speclist = [
     "-d", Arg.String (append dirs),
-    "directory to load in the ocaml interpreter (via #directory)";
+    "add a directory to the search path in the ocaml interpreter (via #directory)";
     "-l", Arg.String (append libs),
-    "libraries (.cma files) to load in the ocaml interpreter (via #load)";
+    "load a .cmo or .cma file in the ocaml interpreter (via #load)";
   ] in
   Arg.parse speclist (append cmts) usage;
   {libs = !libs; dirs = !dirs; cmts = !cmts}
