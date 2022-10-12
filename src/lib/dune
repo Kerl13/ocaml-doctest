@@ -13,3 +13,17 @@
        -l %{cma:doctest}
        .doctest.objs/byte/doctest__Test.cmti
        .doctest.objs/byte/doctest__File.cmti)))
+
+(rule
+ (deps ../../README.md)
+ (action
+  (progn
+   (with-stdout-to index.0.pre (run md2mld ../../README.md))
+   (with-stdout-to index.0.mld
+    ; When we can upgrade to a newer omd, simplify this sed expression to:
+    ; (system "sed 's#^{\\[#{v#;s#^\\]}#v}#' index.broken_mld"))
+    (system "sed 's#^{\\[#{v#;s#^\\]}#v}#;s#\\\\\\([()]\\)#\\1#g' index.0.pre"))
+   (with-stdout-to index.mld (cat index.0.mld index.1.mld))
+   )))
+
+(documentation)

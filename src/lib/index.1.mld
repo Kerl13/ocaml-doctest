@@ -1,0 +1,5 @@
+{1 API}
+
+[ocaml-doctest] is meant to be used as an executable but its internal API is
+exposed {{!Doctest} here} for those willing to hack around.
+Note this also serves as a demo of as [ocaml-doctest] is used to test itself ;)

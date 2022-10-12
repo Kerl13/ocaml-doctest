@@ -1,4 +1,4 @@
-(lang dune 3.3)
+(lang dune 3.4)
 
 (name doctest)
 (version 0.1.0-alpha1)
