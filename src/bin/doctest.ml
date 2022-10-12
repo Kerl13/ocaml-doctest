@@ -25,7 +25,15 @@ let parse_args () =
     "load a .cmo or .cma file in the ocaml interpreter (via #load)";
   ] in
   Arg.parse speclist (append cmts) usage;
-  {libs = !libs; dirs = !dirs; cmts = !cmts}
+  match !cmts, !dirs, !libs with
+  | [], [], [] ->
+    Arg.usage speclist usage;
+    exit 0
+  | [], _, _ ->
+    Arg.usage speclist usage;
+    Format.eprintf "Not enough arguments\n";
+    exit 1
+  | cmts, dirs, libs -> {libs; dirs; cmts}
 
 let () =
   let config = parse_args () in
