@@ -51,14 +51,14 @@ let factorial =
     f 1 n
 ```
 
-Note the `@doctest` tag at the beginning of the formatted code block delimited
+Note the `@doctest` tag at the beginning of the formatted code blocks delimited
 by `{[ ... ]}`. `ocaml-doctest` reads these code blocks and feeds their
 instructions (delimited by `# ... ;;`) to the ocaml toplevel to check their
 output against what is specified in the documentation.
 
-This is achived by first compiling your module with `-bin-annot` and passing the
-produced `.cmt` (and `.cmti` if you have a `.mli`) files to the `doctest` like
-so:
+This is achieved by first compiling your module with `-bin-annot` and passing
+the produced `.cmt` (and `.cmti` if you have a `.mli`) files to the `doctest`
+like so:
 
 ```sh
 $ ocamlc -c -bin-annot example.ml
@@ -88,10 +88,10 @@ Got:
 changes. Any feedback is welcome though, so don't hesitate to contact me, fill
 an issue, or send PRs / patches.
 
-The major quirk at the moment is that its very impractical to integrate it with
-dune. Take a look at the `tests/dune` and `src/lib/dune` files on the
-repository to see how its done. And again, if you have a suggestion, please tell
-me! ;)
+The major quirk at the moment is that it is very impractical to integrate it
+with dune. Take a look at the `tests/dune` and `src/lib/dune` files on the
+repository to see how it ss done. And again, if you have any suggestion, please
+tell me! ;)
 
 ## Licence
 
