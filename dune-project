@@ -1,18 +1,25 @@
 (lang dune 3.3)
 
 (name doctest)
+(version 0.1.0-alpha1)
+(source (github Kerl13/ocaml-doctest))
 
 (generate_opam_files true)
 
-(authors "Martin Pépin <kerl@wkerl.me>")
+(license GPL-3.0-or-later)
 
+(authors "Martin Pépin <kerl@wkerl.me>")
 (maintainers "Martin Pépin <kerl@wkerl.me>")
 
 (package
  (name doctest)
- (synopsis "doctesting ocaml modules")
+ (synopsis "Doctesting ocaml modules")
+ (description "This package provides doc testing facilities for OCaml in the
+  style of Python's doctest. It allow to write executable documentation in
+  {@doctest [ ... ]} ocamldoc comments that can be checked for correctness.
+  This gives the opportunity to kill two birds with one stone as part of your
+  documentation becomes a test as well.")
  (depends
   (ocaml :build)
   (dune :build)
-  compiler-libs
   odoc-parser))
