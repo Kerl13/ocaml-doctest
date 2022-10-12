@@ -15,7 +15,7 @@ homepage: "https://github.com/Kerl13/ocaml-doctest"
 bug-reports: "https://github.com/Kerl13/ocaml-doctest/issues"
 depends: [
   "ocaml" {build}
-  "dune" {>= "3.3" & build}
+  "dune" {>= "3.4" & build}
   "odoc-parser"
   "odoc" {with-doc}
 ]
