@@ -1,7 +1,7 @@
 (lang dune 3.4)
 
 (name doctest)
-(version 0.1.0-alpha1)
+(version 0.1.0-alpha)
 (source (github Kerl13/ocaml-doctest))
 
 (generate_opam_files true)
