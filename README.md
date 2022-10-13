@@ -88,10 +88,32 @@ Got:
 changes. Any feedback is welcome though, so don't hesitate to contact me, fill
 an issue, or send PRs / patches.
 
-The major quirk at the moment is that it is very impractical to integrate it
-with dune. Take a look at the `tests/dune` and `src/lib/dune` files on the
-repository to see how it ss done. And again, if you have any suggestion, please
-tell me! ;)
+## Dune integration
+
+The major quirk (and thus most urgent issue) is that it is very impractical to
+integrate `ocaml-doctest` with dune at the moment.
+
+Basically, you have to add a rule in your dune file which looks like this:
+```dune
+(rule
+ (alias runtest)
+ (action
+  (run doctest
+    -d .your_package.objs/byte
+    -l %{lib:first_dependency:first_dep.cma}
+    -l %{lib:second_dependency:second_dep.cma}
+    ...
+    -l %{cma:testlib}
+   .your_package.objs/byte/your_package__SomeModule.cmt
+   .your_package.objs/byte/your_package__SomeOtherModule.cmt
+   .your_package.objs/byte/your_package__SomeModuleWithAnInterface.cmti)))
+```
+You will find examples of this in the `tests/dune` and `src/lib/dune` files in
+the repository.
+The list of `-l %{lib:foo:bar.cma}` options you have to add for your specific
+project can be given by `dune ocaml top | grep '^#load'`, though I have had
+issues with it not being sufficient.
+If you have any suggestion to make this better, please tell me! ^^
 
 ## Licence
 
