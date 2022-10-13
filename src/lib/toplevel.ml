@@ -29,7 +29,12 @@ let initialise ~dirs ~libs =
   List.iter
     (fun filename ->
       add_directory (Filename.dirname filename);
-      if not (Toploop.load_file Format.err_formatter filename) then
-        panic "could not load file `%s'" filename)
+      (* FIXME: these should not panic *)
+      try
+        if not (Toploop.load_file Format.err_formatter filename) then
+          panic "could not load file `%s'" filename
+      with Symtable.Error error ->
+        panic "an error occurred while reading `%s':\n%a"
+          filename Symtable.report_error error)
     libs;
   patch_printer ()
