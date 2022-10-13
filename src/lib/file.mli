@@ -5,7 +5,7 @@ type t
 
 (** {2 File operations} *)
 
-val of_filename: string -> t
+val of_filename: string -> (t, string) result
 (** Check that a file name corresponds to a valid testable file and convert it
   to {!t}. *)
 

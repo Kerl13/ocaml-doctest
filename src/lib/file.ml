@@ -2,10 +2,13 @@ type t = string
 
 (** {2 File operations} *)
 
-let of_filename (filename: string) : t =
+let of_filename (filename: string) =
   match Filename.extension filename with
-  | ".cmt" | ".cmti" -> filename
-  | _ -> invalid_arg "File.of_filename: a .cmt file is expected"
+  | ".cmt" | ".cmti" ->
+    if Sys.file_exists filename
+    then Ok filename
+    else Utils.fail "File `%s' does not exist" filename
+  | _ -> Utils.fail "File.of_filename: a .cmt file is expected"
 
 let collect_doc_comments file =
   let cmt = Cmt_format.read_cmt file in

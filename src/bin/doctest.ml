@@ -40,15 +40,18 @@ let () =
 
   Toplevel.initialise ~dirs:config.dirs ~libs:config.libs;
 
-  let report =
+  let report, err =
     List.fold_left
-      (fun report filename ->
-        File.of_filename filename
-        |> Run.file
-        |> Run.Report.join report)
-      Run.Report.empty
+      (fun (report, err) filename ->
+        match File.of_filename filename with
+        | Ok file ->
+          (file |> Run.file |> Run.Report.join report), err
+        | Error msg ->
+          Format.eprintf "[ERROR] %s@." msg;
+          report, true)
+      (Run.Report.empty, false)
       config.cmts
   in
-  let rc = if report.nb_ok < report.nb_tests then 1 else 0 in
+  let rc = if err || report.nb_ok < report.nb_tests then 1 else 0 in
   Format.eprintf "[INFO] Total: %a@." Run.Report.pp report;
   exit rc
