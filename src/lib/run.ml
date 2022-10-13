@@ -51,4 +51,4 @@ let file (file: File.t) : Report.t =
     (fun report c ->
       Report.join report (comment c))
     Report.empty
-    (File.collect_doc_comments file)
+    file.comments

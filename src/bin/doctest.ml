@@ -43,7 +43,7 @@ let () =
   let report, err =
     List.fold_left
       (fun (report, err) filename ->
-        match File.of_filename filename with
+        match File.parse filename with
         | Ok file ->
           (file |> Run.file |> Run.Report.join report), err
         | Error msg ->
