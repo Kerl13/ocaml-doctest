@@ -84,9 +84,10 @@ Got:
 
 ## Disclaimer
 
-`ocaml-doctest` is at a very early stage of development, so expect bugs and API
-changes. Any feedback is welcome though, so don't hesitate to contact me, fill
-an issue, or send PRs / patches.
+`ocaml-doctest` is at an early stage of development, so expect bugs and API
+changes. However it should kinda work now and any feedback from early testers is
+welcome! Don't hesitate to get in touch with me and/or fill an issue if you
+encounter problems. Pull requests / patches are also welcome.
 
 ## Dune integration
 
