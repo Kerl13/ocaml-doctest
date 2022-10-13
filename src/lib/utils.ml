@@ -13,7 +13,11 @@ let ok = Ok ()
 (** {2 Error handling} *)
 
 let panic args =
-  Format.kasprintf (Format.eprintf "[PANIC] %s@.") args
+  Format.kasprintf
+    (fun msg ->
+      Format.eprintf "[PANIC] %s@." msg;
+      exit 2)
+    args
 
 let fail args =
   Format.kasprintf Result.error args

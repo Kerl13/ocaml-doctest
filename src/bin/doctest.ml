@@ -25,7 +25,7 @@ let parse_args () =
     "load a .cmo or .cma file in the ocaml interpreter (via #load)";
   ] in
   Arg.parse speclist (append cmts) usage;
-  match !cmts, !dirs, !libs with
+  match List.rev !cmts, List.rev !dirs, List.rev !libs with
   | [], [], [] ->
     Arg.usage speclist usage;
     exit 0
