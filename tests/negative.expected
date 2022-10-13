@@ -6,4 +6,4 @@ Expected:
 Got:
   - : bool = false
 [INFO] File "tests/negative.ml", lines 1-10, characters 0-2: 0 / 1 tests passed
-Total: 0 / 1 tests passed
+[INFO] Total: 0 / 1 tests passed
